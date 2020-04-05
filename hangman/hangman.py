@@ -1,10 +1,12 @@
-from random_word import RandomWords
+import random
 
 # Create guess the word game
+WORD_LIST = ['apple', 'banana', 'bumblebee', 'caterpillar', 'zebra']
 GUESS_WORD = []
-SECRET_WORD = RandomWords()
-SECRET_WORD = SECRET_WORD.get_random_word()
+SECRET_WORD = random.choice(WORD_LIST)
 LENGTH_OF_WORD = len(SECRET_WORD)
+ALPHABET = "abcdefghijklmnopqrstuvwxyz"
+letter_storage = []
 
 
 def print_word_to_guess():
@@ -18,70 +20,57 @@ def print_word_to_guess():
     print(GUESS_WORD)
 
 
+def print_guesses_left(current: int, total: int):
+    """Prints how many chances the player has left"""
+    print("You are on guess {0}/{1}".format(current, total))
+
+
 # User needs to be able input letter guesses
-def guess_word(secret_word, tries_left):
-    used_letters = ""
+def guess_word(secret_word):
+    guess_taken = 1
+    max_guess = 10
 
     # Number of turns that the user has:
     print("\nInstructions:")
-    print("You have " + str(tries_left) + " tries to guess the word!")
     print("Be aware that You can enter only 1 letter from a-z")
-    print(10*"======"+"\n")
+    print(10 * "======" + "\n")
 
     # While user has tries left
-    while tries_left != 0:
+    while guess_taken < max_guess:
         answer = input("Please enter a letter: \n").lower()
 
         # Restrict user to only a single letter
-        while len(answer) != 1:
-            answer = input("Please enter a single letter: \n").lower()
-
-        # If user guessed the right letter
-        if answer in secret_word:
-            print(10*"======")
-            print("\n***** You have guessed correctly! *****\n")
-
-            # If its a duplicate letter
-            if answer in used_letters:
-                continue
-
-            # If its a new letter, add it to the list of used letters
-            else:
-                used_letters += answer + " "
-
-            for x in range(0, len(secret_word)):
-                if secret_word[x] == answer:
-                    GUESS_WORD[x] = secret_word[x]
-            print(GUESS_WORD)
-            print("Used letters: " + used_letters+"\n")
-
-            if list(SECRET_WORD) == GUESS_WORD:
-                print("***** GOOD JOB! YOU HAVE WON *****")
-                break
-            else:
-                print("Guess another character!")
-
+        if answer not in ALPHABET:
+            print("Enter a letter from a-z ALPHABET")
+        elif answer in letter_storage:
+            print("You have already used this letter!")
         else:
-            print(10*"======")
-            print("\nWrong! Try another letter!")
-            tries_left -= 1
-            print("You have " + str(tries_left) + " tries left!\n")
-            print(GUESS_WORD)
+            letter_storage.append(answer)
+        # If user guessed the right letter
+            if answer in secret_word:
+                print(10 * "======")
+                print("\n***** You have guessed correctly! *****\n")
 
-            if answer in used_letters:
-                continue
+                for x in range(0, LENGTH_OF_WORD):
+                    if secret_word[x] == answer:
+                        GUESS_WORD[x] = secret_word[x]
+                print(GUESS_WORD)
+
+                if list(SECRET_WORD) == GUESS_WORD:
+                    print("***** GOOD JOB! YOU HAVE WON *****")
+                    break
             else:
-                used_letters += answer + " "
-            print("Used letters: " + used_letters+"\n")
-            if tries_left == 0:
-                print("Game Over! You have used up all your chances. Better luck next time!")
-                break
+                print(10 * "======")
+                print("\nWrong! Try another letter!")
+                guess_taken += 1
+                print_guesses_left(guess_taken, max_guess)
+                print(GUESS_WORD)
+                if guess_taken == max_guess:
+                    print("Game Over! You have used up all your chances. The secret word was: '" + SECRET_WORD + "'.Better luck next time!")
+                    break
 
 
 if __name__ == "__main__":
     print_word_to_guess()
-    guess_word(SECRET_WORD, 10)
+    guess_word(SECRET_WORD)
 
-# A limit should also be set on how many guesses they can use
-
-# Keep notifying the user of the remaining turns
